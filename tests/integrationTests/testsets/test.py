@@ -1,19 +1,14 @@
 import pytest
 import utils.read as read
-import utils.filesystem as fs
-import utils.execute as execute
 
 
+@pytest.mark.usefixtures("execute_pimd_qmcf")
 class TestMethod:
 
     i = 1
 
-    @pytest.fixture(scope="class", autouse=True)
-    def setup(self, executable):
-        self.i += 1
-        yield
-        print("teardown_class called")
-
     def test_test(self):
-        print("hallo")
-        assert read.func() == self.i
+        assert read.func() == self.i + 1
+
+    def test_test2(self):
+        assert read.func() == self.i + 2

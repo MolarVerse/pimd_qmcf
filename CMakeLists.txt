@@ -79,10 +79,12 @@ if(BUILD_WITH_MPI)
     include(mpi)
 endif()
 
-include(testing)
+if(BUILD_WITH_TESTS)
+    include(testing)
+    add_subdirectory(tests)
+endif()
 
 add_subdirectory(src)
-add_subdirectory(tests)
 add_subdirectory(apps)
 
 if(BUILD_WITH_DOC)

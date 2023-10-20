@@ -44,3 +44,9 @@ option(BUILD_WITH_DOCS "Build documentation" ON)
 # BUILD WITH BENCHMARKING
 # ***********************
 option(BUILD_WITH_BENCHMARKING "Build benchmarking" OFF)
+
+# ***************
+# Testing options
+# ***************
+option(BUILD_WITH_TESTS "Build tests" ON)
+option(BUILD_WITH_INTEGRATION_TESTS "Build integration tests" OFF)

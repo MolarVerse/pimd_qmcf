@@ -40,21 +40,24 @@ def input_file(pytestconfig):
 
 
 @pytest.fixture(scope="class")
-def execute_pimd_qmcf(executable, input_file):
+def execute_pimd_qmcf(executable, test_dir, input_file):
 
     dir = "temp"
 
-    os.chdir("referenceData/cgo_mmmd")
+    os.chdir("referenceData/" + test_dir)
     if (os.path.exists(dir) and os.path.isdir(dir)):
         shutil.rmtree(dir)
     os.mkdir(dir)
 
     shutil.copy(input_file, dir)
-    # os.chdir(dir)
+    shutil.copy("cgo-mm-00.rst", dir)
+    shutil.copy("moldescriptor.dat", dir)
+    shutil.copy("guff.dat", dir)
+    os.chdir(dir)
 
-    # subprocess([executable, input_file])
+    subprocess.run([executable, input_file])
 
     yield
 
-    # os.chdir("..")
+    os.chdir("..")
     shutil.rmtree(dir)

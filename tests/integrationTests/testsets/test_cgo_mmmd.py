@@ -10,7 +10,6 @@ class TestCGOMMMD:
         list_files = map(str, os.listdir())
 
         endings = [".en", ".xyz"]
-        # endings = [".in"]
 
         for ending in endings:
             assert len(

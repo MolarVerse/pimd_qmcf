@@ -7,9 +7,12 @@ import os
 class TestCGOMMMD:
 
     def test_check_all_files(self):
-        list_files = map(str, os.listdir())
+        list_files = os.listdir()
+        list_files = list(file for file in list_files if os.path.isfile(file))
 
         endings = [".en", ".xyz"]
+
+        print(list_files)
 
         for ending in endings:
             assert len(

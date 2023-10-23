@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def read_energy_file(filename):
+def energy_file(filename):
     """Reads the energy file and returns all the data in it.
 
     Args:
@@ -10,11 +10,6 @@ def read_energy_file(filename):
     Returns:
         np.array: collection of all the data in the file.
     """
-    with open(filename, "r") as f:
-        data = np.array([line.split() for line in f.readlines()], dtype=float)
+    data = np.loadtxt(filename, dtype=float)
 
     return data
-
-
-def func():
-    return 1

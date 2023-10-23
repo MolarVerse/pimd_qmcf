@@ -39,7 +39,7 @@
 
 # Output files
 
-      file_prefix  = cgo-mm-01;
+      file_prefix  = output;
 
 # end of infile
 

@@ -21,6 +21,7 @@
 ******************************************************************************/
 
 #include "constants/conversionFactors.hpp"   // for _KG_PER_LITER_TO_AMU_PER_ANGSTROM_CUBIC_
+#include "manostatSettings.hpp"              // for ManostatSettings
 #include "matrixNear.hpp"                    // for EXPECT_MATRIX_NEAR
 #include "staticMatrix3x3.hpp"               // for StaticMatrix3x3
 #include "triclinicBox.hpp"                  // for TriclinicBox
@@ -124,6 +125,113 @@ TEST(TestTriclinicBox, calculateShiftVectors)
     const auto shiftVector = box.calculateShiftVector(position);
 
     EXPECT_VECTOR_NEAR(shiftVector, (position - newPosition), 1e-8);
+}
+
+TEST(TestTriclinicBox, transformIntoOrthogonalSpace)
+{
+    auto box = TriclinicBox();
+    box.setBoxDimensions({1.0, 2.0, 3.0});
+    box.setBoxAngles({90.0, 90.0, 90.0});
+
+    const auto position       = linearAlgebra::Vec3D({1.3, 2.3, 3.3});
+    const auto positionMatrix = linearAlgebra::tensor3D{{1.3, 2.3, 3.3}, {1.3, 2.3, 3.3}, {1.3, 2.3, 3.3}};
+    auto       newPosition    = linearAlgebra::Vec3D({1.3, 2.3, 3.3});
+    auto       newMatrix      = linearAlgebra::tensor3D{{1.3, 2.3, 3.3}, {1.3, 2.3, 3.3}, {1.3, 2.3, 3.3}};
+
+    auto transformedPosition = box.transformIntoOrthogonalSpace(position);
+    auto transformedMatrix   = box.transformIntoOrthogonalSpace(positionMatrix);
+
+    EXPECT_VECTOR_NEAR(transformedPosition, newPosition, 1e-8);
+    EXPECT_MATRIX_NEAR(transformedMatrix, newMatrix, 1e-8);
+
+    box.setBoxAngles({30.0, 60.0, 45.0});
+
+    newPosition = inverse(box.getTransformationMatrix()) * position;
+    newMatrix   = inverse(box.getTransformationMatrix()) * positionMatrix;
+
+    transformedPosition = box.transformIntoOrthogonalSpace(position);
+    transformedMatrix   = box.transformIntoOrthogonalSpace(positionMatrix);
+
+    EXPECT_VECTOR_NEAR(transformedPosition, newPosition, 1e-8);
+    EXPECT_MATRIX_NEAR(transformedMatrix, newMatrix, 1e-8);
+}
+
+TEST(TestTriclinicBox, transformIntoSimulationSpace)
+{
+    auto box = TriclinicBox();
+    box.setBoxDimensions({1.0, 2.0, 3.0});
+    box.setBoxAngles({90.0, 90.0, 90.0});
+
+    const auto position       = linearAlgebra::Vec3D({1.3, 2.3, 3.3});
+    const auto positionMatrix = linearAlgebra::tensor3D{{1.3, 2.3, 3.3}, {1.3, 2.3, 3.3}, {1.3, 2.3, 3.3}};
+    auto       newPosition    = linearAlgebra::Vec3D({1.3, 2.3, 3.3});
+    auto       newMatrix      = linearAlgebra::tensor3D{{1.3, 2.3, 3.3}, {1.3, 2.3, 3.3}, {1.3, 2.3, 3.3}};
+
+    auto transformedPosition = box.transformIntoSimulationSpace(position);
+    auto transformedMatrix   = box.transformIntoSimulationSpace(positionMatrix);
+
+    EXPECT_VECTOR_NEAR(transformedPosition, newPosition, 1e-8);
+    EXPECT_MATRIX_NEAR(transformedMatrix, newMatrix, 1e-8);
+
+    box.setBoxAngles({30.0, 60.0, 45.0});
+
+    newPosition = box.getTransformationMatrix() * position;
+    newMatrix   = box.getTransformationMatrix() * positionMatrix;
+
+    transformedPosition = box.transformIntoSimulationSpace(position);
+    transformedMatrix   = box.transformIntoSimulationSpace(positionMatrix);
+
+    EXPECT_VECTOR_NEAR(transformedPosition, newPosition, 1e-8);
+    EXPECT_MATRIX_NEAR(transformedMatrix, newMatrix, 1e-8);
+}
+
+TEST(TestTriclinicBox, calculateBoxDimensionsAndAnglesFromBoxMatrix)
+{
+    auto box = TriclinicBox();
+    box.setBoxDimensions({1.0, 2.0, 3.0});
+    box.setBoxAngles({30.0, 60.0, 45.0});
+
+    auto boxDimensionsAndAngles = calculateBoxDimensionsAndAnglesFromBoxMatrix(box.getBoxMatrix());
+
+    EXPECT_VECTOR_NEAR(boxDimensionsAndAngles.first, box.getBoxDimensions(), 1e-10);
+    EXPECT_VECTOR_NEAR(boxDimensionsAndAngles.second, box.getBoxAngles(), 1e-10);
+}
+
+TEST(TestTriclinicBox, scaleBox)
+{
+    auto scalingTensor = linearAlgebra::tensor3D{{1.0, 0.0, 0.0}, {0.0, 2.0, 0.0}, {0.0, 0.0, 3.0}};
+
+    auto box = TriclinicBox();
+    box.setBoxDimensions({1.0, 2.0, 3.0});
+    box.setBoxAngles({30.0, 60.0, 45.0});
+    auto oldBoxMatrix = box.getBoxMatrix();
+
+    box.scaleBox(scalingTensor);
+
+    auto newBoxDimensions  = linearAlgebra::Vec3D({1.0, 4.0, 9.0});
+    auto newBoxAngles      = linearAlgebra::Vec3D({30.0, 60.0, 45.0});
+    auto newBoxMatrix_row1 = oldBoxMatrix[0] * linearAlgebra::Vec3D(1.0, 2.0, 3.0);
+    auto newBoxMatrix_row2 = oldBoxMatrix[1] * linearAlgebra::Vec3D(1.0, 2.0, 3.0);
+    auto newBoxMatrix_row3 = oldBoxMatrix[2] * linearAlgebra::Vec3D(1.0, 2.0, 3.0);
+    EXPECT_VECTOR_NEAR(box.getBoxMatrix()[0], newBoxMatrix_row1, 1e-12);
+    EXPECT_VECTOR_NEAR(box.getBoxMatrix()[1], newBoxMatrix_row2, 1e-12);
+    EXPECT_VECTOR_NEAR(box.getBoxMatrix()[2], newBoxMatrix_row3, 1e-12);
+    EXPECT_VECTOR_NEAR(box.getBoxDimensions(), newBoxDimensions, 1e-12);
+    EXPECT_VECTOR_NEAR(box.getBoxAngles(), newBoxAngles, 1e-12);
+
+    settings::ManostatSettings::setIsotropy(settings::Isotropy::FULL_ANISOTROPIC);
+
+    box.setBoxDimensions({1.0, 2.0, 3.0});
+    box.setBoxAngles({30.0, 60.0, 45.0});
+
+    box.scaleBox(scalingTensor);
+
+    newBoxMatrix_row1 = oldBoxMatrix[0] * 1.0;
+    newBoxMatrix_row2 = oldBoxMatrix[1] * 2.0;
+    newBoxMatrix_row3 = oldBoxMatrix[2] * 3.0;
+    EXPECT_VECTOR_NEAR(box.getBoxMatrix()[0], newBoxMatrix_row1, 1e-12);
+    EXPECT_VECTOR_NEAR(box.getBoxMatrix()[1], newBoxMatrix_row2, 1e-12);
+    EXPECT_VECTOR_NEAR(box.getBoxMatrix()[2], newBoxMatrix_row3, 1e-12);
 }
 
 int main(int argc, char **argv)

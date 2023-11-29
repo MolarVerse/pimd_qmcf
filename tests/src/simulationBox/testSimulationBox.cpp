@@ -287,6 +287,65 @@ TEST_F(TestSimulationBox, setPartialChargesOfMoleculesFromMoleculeTypes)
 }
 
 /**
+ * @brief tests calculateCenterOfMass function
+ *
+ */
+TEST_F(TestSimulationBox, calculateCenterOfMass)
+{
+    simulationBox::SimulationBox simulationBox;
+
+    const auto atom1 = std::make_shared<simulationBox::Atom>();
+    const auto atom2 = std::make_shared<simulationBox::Atom>();
+    const auto atom3 = std::make_shared<simulationBox::Atom>();
+
+    atom1->setMass(1.0);
+    atom2->setMass(2.0);
+    atom3->setMass(1.0);
+
+    atom1->setPosition(linearAlgebra::Vec3D(0.0, 1.0, 1.0));
+    atom2->setPosition(linearAlgebra::Vec3D(1.0, 0.0, 2.0));
+    atom3->setPosition(linearAlgebra::Vec3D(2.0, 2.0, 0.0));
+
+    simulationBox.addAtom(atom1);
+    simulationBox.addAtom(atom2);
+    simulationBox.addAtom(atom3);
+
+    simulationBox.calculateTotalMass();
+    simulationBox.calculateCenterOfMass();
+
+    EXPECT_EQ(simulationBox.getCenterOfMass(), linearAlgebra::Vec3D(1.0, 3.0 / 4.0, 5.0 / 4.0));
+}
+
+/**
+ * @brief tests calculateMomentum function
+ *
+ */
+TEST_F(TestSimulationBox, calculateMomentum)
+{
+    simulationBox::SimulationBox simulationBox;
+
+    const auto atom1 = std::make_shared<simulationBox::Atom>();
+    const auto atom2 = std::make_shared<simulationBox::Atom>();
+    const auto atom3 = std::make_shared<simulationBox::Atom>();
+
+    atom1->setMass(1.0);
+    atom2->setMass(2.0);
+    atom3->setMass(1.0);
+
+    atom1->setVelocity(linearAlgebra::Vec3D(0.0, 1.0, 1.0));
+    atom2->setVelocity(linearAlgebra::Vec3D(1.0, 0.0, 2.0));
+    atom3->setVelocity(linearAlgebra::Vec3D(2.0, 2.0, 0.0));
+
+    simulationBox.addAtom(atom1);
+    simulationBox.addAtom(atom2);
+    simulationBox.addAtom(atom3);
+
+    const auto momentum = simulationBox.calculateMomentum();
+
+    EXPECT_EQ(momentum, linearAlgebra::Vec3D(4.0, 3.0, 5.0));
+}
+
+/**
  * @brief tests setPartialChargesOfMoleculesFromMoleculeTypes function
  *
  */

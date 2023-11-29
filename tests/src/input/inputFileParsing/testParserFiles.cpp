@@ -109,6 +109,23 @@ TEST_F(TestInputFileReader, testStartFileName)
 }
 
 /**
+ * @brief tests parsing the "rpmd_start_file" command
+ *
+ */
+TEST_F(TestInputFileReader, testRPMDStartFileName)
+{
+    InputFileParserFiles     parser(*_engine);
+    std::vector<std::string> lineElements = {"rpmd_start_file", "=", "rpmdStart.xyz"};
+    EXPECT_THROW_MSG(parser.parseRingPolymerStartFilename(lineElements, 0),
+                     customException::InputFileException,
+                     "Cannot open ring polymer start file - filename = rpmdStart.xyz");
+
+    lineElements = {"rpmd_start_file", "=", "data/atomSection/testProcess.rst"};
+    parser.parseRingPolymerStartFilename(lineElements, 0);
+    EXPECT_EQ(settings::FileSettings::getRingPolymerStartFileName(), "data/atomSection/testProcess.rst");
+}
+
+/**
  * @brief tests parsing the "moldescriptor_file" command
  *
  */

@@ -89,10 +89,10 @@ void InputFileParserManostat::parseManostat(const std::vector<std::string> &line
     }
 
     else
-        throw customException::InputFileException(
-            std::format("Invalid manostat \"{}\" at line {} in input file. Possible options are: berendsen and none",
-                        lineElements[2],
-                        lineNumber));
+        throw customException::InputFileException(std::format(
+            "Invalid manostat \"{}\" at line {} in input file. Possible options are: berendsen, stochastic_rescaling and none",
+            lineElements[2],
+            lineNumber));
 }
 
 /**

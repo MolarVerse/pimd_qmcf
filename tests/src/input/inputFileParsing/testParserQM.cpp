@@ -41,9 +41,22 @@ TEST_F(TestInputFileReader, parseQMMethod)
     parser.parseQMMethod({"qm_prog", "=", "dftbplus"}, 0);
     EXPECT_EQ(settings::QMSettings::getQMMethod(), settings::QMMethod::DFTBPLUS);
 
+    parser.parseQMMethod({"qm_prog", "=", "pyscf"}, 0);
+    EXPECT_EQ(settings::QMSettings::getQMMethod(), settings::QMMethod::PYSCF);
+
+    parser.parseQMMethod({"qm_prog", "=", "turbomole"}, 0);
+    EXPECT_EQ(settings::QMSettings::getQMMethod(), settings::QMMethod::TURBOMOLE);
+
     ASSERT_THROW_MSG(parser.parseQMMethod({"qm_prog", "=", "notAMethod"}, 0),
                      customException::InputFileException,
                      "Invalid qm_prog \"notAMethod\" in input file - possible values are: dftbplus, pyscf, turbomole")
+}
+
+TEST_F(TestInputFileReader, parseQMScriptFullPath)
+{
+    auto parser = InputFileParserQM(*_engine);
+    parser.parseQMScriptFullPath({"qm_script", "=", "/path/to/script.sh"}, 0);
+    EXPECT_EQ(settings::QMSettings::getQMScriptFullPath(), "/path/to/script.sh");
 }
 
 TEST_F(TestInputFileReader, parseQMScript)

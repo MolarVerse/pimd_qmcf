@@ -157,6 +157,97 @@ TEST_F(TestInputFileReader, testChargeFilename)
     EXPECT_EQ(settings::OutputFileSettings::getChargeFileName(), _fileName);
 }
 
+/**
+ * @brief tests parsing the "file_prefix" command
+ *
+ */
+TEST_F(TestInputFileReader, testFilePrefix)
+{
+    InputFileParserOutput parser(*_engine);
+    _fileName                                   = "prefix";
+    const std::vector<std::string> lineElements = {"filePrefix", "=", _fileName};
+    parser.parseFilePrefix(lineElements, 0);
+    EXPECT_EQ(settings::OutputFileSettings::getFilePrefix(), _fileName);
+}
+
+/**
+ * @brief tests parsing the "rpmd_restart_file" command
+ *
+ */
+TEST_F(TestInputFileReader, testRPMDRestartFilename)
+{
+    InputFileParserOutput parser(*_engine);
+    _fileName                                   = "rpmdRestart.xyz";
+    const std::vector<std::string> lineElements = {"rpmdRestartFilename", "=", _fileName};
+    parser.parseRPMDRestartFilename(lineElements, 0);
+    EXPECT_EQ(settings::OutputFileSettings::getRingPolymerRestartFileName(), _fileName);
+}
+
+/**
+ * @brief tests parsing the "rpmd_traj_file" command
+ *
+ */
+TEST_F(TestInputFileReader, testRPMDTrajectoryFilename)
+{
+    InputFileParserOutput parser(*_engine);
+    _fileName                                   = "rpmdTrajectory.xyz";
+    const std::vector<std::string> lineElements = {"rpmdTrajectoryFilename", "=", _fileName};
+    parser.parseRPMDTrajectoryFilename(lineElements, 0);
+    EXPECT_EQ(settings::OutputFileSettings::getRingPolymerTrajectoryFileName(), _fileName);
+}
+
+/**
+ * @brief tests parsing the "rpmd_energy_file" command
+ *
+ */
+TEST_F(TestInputFileReader, testRPMDEnergyFilename)
+{
+    InputFileParserOutput parser(*_engine);
+    _fileName                                   = "rpmdEnergy.txt";
+    const std::vector<std::string> lineElements = {"rpmdEnergyFilename", "=", _fileName};
+    parser.parseRPMDEnergyFilename(lineElements, 0);
+    EXPECT_EQ(settings::OutputFileSettings::getRingPolymerEnergyFileName(), _fileName);
+}
+
+/**
+ * @brief tests parsing the "rpmd_force_file" command
+ *
+ */
+TEST_F(TestInputFileReader, testRPMDForceFilename)
+{
+    InputFileParserOutput parser(*_engine);
+    _fileName                                   = "rpmdForce.xyz";
+    const std::vector<std::string> lineElements = {"rpmdForceFilename", "=", _fileName};
+    parser.parseRPMDForceFilename(lineElements, 0);
+    EXPECT_EQ(settings::OutputFileSettings::getRingPolymerForceFileName(), _fileName);
+}
+
+/**
+ * @brief tests parsing the "rpmd_velocity_file" command
+ *
+ */
+TEST_F(TestInputFileReader, testRPMDVelocityFilename)
+{
+    InputFileParserOutput parser(*_engine);
+    _fileName                                   = "rpmdVelocity.xyz";
+    const std::vector<std::string> lineElements = {"rpmdVelocityFilename", "=", _fileName};
+    parser.parseRPMDVelocityFilename(lineElements, 0);
+    EXPECT_EQ(settings::OutputFileSettings::getRingPolymerVelocityFileName(), _fileName);
+}
+
+/**
+ * @brief tests parsing the "rpmd_charge_file" command
+ *
+ */
+TEST_F(TestInputFileReader, testRPMDChargeFilename)
+{
+    InputFileParserOutput parser(*_engine);
+    _fileName                                   = "rpmdCharge.xyz";
+    const std::vector<std::string> lineElements = {"rpmdChargeFilename", "=", _fileName};
+    parser.parseRPMDChargeFilename(lineElements, 0);
+    EXPECT_EQ(settings::OutputFileSettings::getRingPolymerChargeFileName(), _fileName);
+}
+
 int main(int argc, char **argv)
 {
     testing::InitGoogleTest(&argc, argv);

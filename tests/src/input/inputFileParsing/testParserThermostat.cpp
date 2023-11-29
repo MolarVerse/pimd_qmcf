@@ -111,6 +111,57 @@ TEST_F(TestInputFileReader, testParseThermostat)
                      "velocity_rescaling, langevin, nh-chain");
 }
 
+/**
+ * @brief tests parsing the "friction" command
+ *
+ */
+TEST_F(TestInputFileReader, testParseThermostatFriction)
+{
+    InputFileParserThermostat parser(*_engine);
+    std::vector<std::string>  lineElements = {"friction", "=", "0.1"};
+    parser.parseThermostatFriction(lineElements, 0);
+    EXPECT_EQ(settings::ThermostatSettings::getFriction(), 0.1 * 1.0e12);
+
+    lineElements = {"friction", "=", "-100.0"};
+    EXPECT_THROW_MSG(parser.parseThermostatFriction(lineElements, 0),
+                     customException::InputFileException,
+                     "Friction of thermostat cannot be negative");
+}
+
+/**
+ * @brief tests parsing the "nh_chain-length" command
+ *
+ */
+TEST_F(TestInputFileReader, testParseThermostatNHChainLength)
+{
+    InputFileParserThermostat parser(*_engine);
+    std::vector<std::string>  lineElements = {"nh_chain-length", "=", "3"};
+    parser.parseThermostatChainLength(lineElements, 0);
+    EXPECT_EQ(settings::ThermostatSettings::getNoseHooverChainLength(), 3);
+
+    lineElements = {"nh_chain-length", "=", "-100.0"};
+    EXPECT_THROW_MSG(parser.parseThermostatChainLength(lineElements, 0),
+                     customException::InputFileException,
+                     "Chain length of thermostat cannot be negative");
+}
+
+/**
+ * @brief tests parsing the "coupling_frequency" command
+ *
+ */
+TEST_F(TestInputFileReader, testParseThermostatCouplingFrequency)
+{
+    InputFileParserThermostat parser(*_engine);
+    std::vector<std::string>  lineElements = {"coupling_frequency", "=", "3"};
+    parser.parseThermostatCouplingFrequency(lineElements, 0);
+    EXPECT_EQ(settings::ThermostatSettings::getNoseHooverCouplingFrequency(), 3);
+
+    lineElements = {"coupling_frequency", "=", "-100.0"};
+    EXPECT_THROW_MSG(parser.parseThermostatCouplingFrequency(lineElements, 0),
+                     customException::InputFileException,
+                     "Coupling frequency of thermostat cannot be negative");
+}
+
 int main(int argc, char **argv)
 {
     testing::InitGoogleTest(&argc, argv);

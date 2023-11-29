@@ -86,10 +86,15 @@ TEST_F(TestInputFileReader, ParseManostat)
     parser.parseManostat(lineElements, 0);
     EXPECT_EQ(settings::ManostatSettings::getManostatType(), settings::ManostatType::BERENDSEN);
 
+    lineElements = {"manostat", "=", "stochastic_rescaling"};
+    parser.parseManostat(lineElements, 0);
+    EXPECT_EQ(settings::ManostatSettings::getManostatType(), settings::ManostatType::STOCHASTIC_RESCALING);
+
     lineElements = {"manostat", "=", "notValid"};
-    EXPECT_THROW_MSG(parser.parseManostat(lineElements, 0),
-                     customException::InputFileException,
-                     "Invalid manostat \"notValid\" at line 0 in input file. Possible options are: berendsen and none");
+    EXPECT_THROW_MSG(
+        parser.parseManostat(lineElements, 0),
+        customException::InputFileException,
+        "Invalid manostat \"notValid\" at line 0 in input file. Possible options are: berendsen, stochastic_rescaling and none");
 }
 
 /**
@@ -108,6 +113,68 @@ TEST_F(TestInputFileReader, ParseCompressibility)
     lineElements = {"compressibility", "=", "-0.1"};
     EXPECT_THROW_MSG(
         parser.parseCompressibility(lineElements, 0), customException::InputFileException, "Compressibility cannot be negative");
+}
+
+/**
+ * @brief tests parsing the "isotropy" command
+ *
+ */
+TEST_F(TestInputFileReader, ParseIsotropy)
+{
+    InputFileParserManostat  parser(*_engine);
+    std::vector<std::string> lineElements = {"isotropy", "=", "isotropic"};
+    parser.parseIsotropy(lineElements, 0);
+    EXPECT_EQ(settings::ManostatSettings::getIsotropy(), settings::Isotropy::ISOTROPIC);
+
+    lineElements = {"isotropy", "=", "anisotropic"};
+    parser.parseIsotropy(lineElements, 0);
+    EXPECT_EQ(settings::ManostatSettings::getIsotropy(), settings::Isotropy::ANISOTROPIC);
+
+    lineElements = {"isotropy", "=", "full_anisotropic"};
+    parser.parseIsotropy(lineElements, 0);
+    EXPECT_EQ(settings::ManostatSettings::getIsotropy(), settings::Isotropy::FULL_ANISOTROPIC);
+
+    lineElements = {"isotropy", "=", "xy"};
+    parser.parseIsotropy(lineElements, 0);
+    EXPECT_EQ(settings::ManostatSettings::getIsotropy(), settings::Isotropy::SEMI_ISOTROPIC);
+    EXPECT_EQ(settings::ManostatSettings::get2DIsotropicAxes(), std::vector<size_t>({0, 1}));
+    EXPECT_EQ(settings::ManostatSettings::get2DAnisotropicAxis(), 2);
+
+    lineElements = {"isotropy", "=", "yx"};
+    parser.parseIsotropy(lineElements, 0);
+    EXPECT_EQ(settings::ManostatSettings::getIsotropy(), settings::Isotropy::SEMI_ISOTROPIC);
+    EXPECT_EQ(settings::ManostatSettings::get2DIsotropicAxes(), std::vector<size_t>({0, 1}));
+    EXPECT_EQ(settings::ManostatSettings::get2DAnisotropicAxis(), 2);
+
+    lineElements = {"isotropy", "=", "xz"};
+    parser.parseIsotropy(lineElements, 0);
+    EXPECT_EQ(settings::ManostatSettings::getIsotropy(), settings::Isotropy::SEMI_ISOTROPIC);
+    EXPECT_EQ(settings::ManostatSettings::get2DIsotropicAxes(), std::vector<size_t>({0, 2}));
+    EXPECT_EQ(settings::ManostatSettings::get2DAnisotropicAxis(), 1);
+
+    lineElements = {"isotropy", "=", "zx"};
+    parser.parseIsotropy(lineElements, 0);
+    EXPECT_EQ(settings::ManostatSettings::getIsotropy(), settings::Isotropy::SEMI_ISOTROPIC);
+    EXPECT_EQ(settings::ManostatSettings::get2DIsotropicAxes(), std::vector<size_t>({0, 2}));
+    EXPECT_EQ(settings::ManostatSettings::get2DAnisotropicAxis(), 1);
+
+    lineElements = {"isotropy", "=", "yz"};
+    parser.parseIsotropy(lineElements, 0);
+    EXPECT_EQ(settings::ManostatSettings::getIsotropy(), settings::Isotropy::SEMI_ISOTROPIC);
+    EXPECT_EQ(settings::ManostatSettings::get2DIsotropicAxes(), std::vector<size_t>({1, 2}));
+    EXPECT_EQ(settings::ManostatSettings::get2DAnisotropicAxis(), 0);
+
+    lineElements = {"isotropy", "=", "zy"};
+    parser.parseIsotropy(lineElements, 0);
+    EXPECT_EQ(settings::ManostatSettings::getIsotropy(), settings::Isotropy::SEMI_ISOTROPIC);
+    EXPECT_EQ(settings::ManostatSettings::get2DIsotropicAxes(), std::vector<size_t>({1, 2}));
+    EXPECT_EQ(settings::ManostatSettings::get2DAnisotropicAxis(), 0);
+
+    lineElements = {"isotropy", "=", "notValid"};
+    EXPECT_THROW_MSG(parser.parseIsotropy(lineElements, 0),
+                     customException::InputFileException,
+                     "Invalid isotropy \"notValid\" at line 0 in input file. Possible options are: isotropic, "
+                     "xy, xz, yz, anisotropic and full_anisotropic");
 }
 
 int main(int argc, char **argv)
